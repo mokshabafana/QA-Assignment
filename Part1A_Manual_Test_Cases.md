@@ -1,112 +1,266 @@
-# Part 1A - Manual Test Cases
+# Part 1A - Test Design
+## Task A - Manual Test Scenarios (20)
 
-## Feature: Login Page
+### Boundary Test Cases
 
-### Test Case 1
-**Test Case ID:** TC_LOGIN_001
+### TC_001 - Distance exactly 5 km
+**Preconditions/Data Setup:**
+Candidate hotel is exactly 5.0 km away and meets all other recommendation rules.
 
-**Title:** Verify login with valid credentials
-
-**Preconditions:**
-- User is registered.
-- User is on the Login page.
-
-**Test Steps:**
-1. Enter a valid email address.
-2. Enter a valid password.
-3. Click the Login button.
+**Steps:**
+1. Select a hotel.
+2. Generate recommendations.
 
 **Expected Result:**
-- User is successfully logged in.
-- Dashboard/Home page is displayed.
-
-**Priority:** High
-
-**Status:** Not Executed
+Hotel should be included in recommendations.
 
 ---
 
-### Test Case 2
-**Test Case ID:** TC_LOGIN_002
+### TC_002 - Distance greater than 5 km
+**Preconditions/Data Setup:**
+Candidate hotel is 5.1 km away.
 
-**Title:** Verify login with invalid password
-
-**Preconditions:**
-- User account exists.
-
-**Test Steps:**
-1. Enter a valid email.
-2. Enter an incorrect password.
-3. Click Login.
+**Steps:**
+1. Select a hotel.
+2. Generate recommendations.
 
 **Expected Result:**
-- Appropriate error message is displayed.
-- User remains on the Login page.
-
-**Priority:** High
-
-**Status:** Not Executed
+Hotel should not be recommended.
 
 ---
 
-### Test Case 3
-**Test Case ID:** TC_LOGIN_003
+### TC_003 - Candidate price ₹1 less than selected hotel
+**Preconditions/Data Setup:**
+Selected Hotel = ₹21,000
+Candidate = ₹20,999
 
-**Title:** Verify login with invalid email format
-
-**Preconditions:**
-- Login page is open.
-
-**Test Steps:**
-1. Enter an invalid email format (example: abc.com).
-2. Enter any password.
-3. Click Login.
+**Steps:**
+Generate recommendations.
 
 **Expected Result:**
-- Validation message for invalid email is displayed.
-
-**Priority:** Medium
-
-**Status:** Not Executed
+Candidate should qualify as cheaper.
 
 ---
 
-### Test Case 4
-**Test Case ID:** TC_LOGIN_004
+### TC_004 - Candidate price equal to selected hotel
+**Preconditions/Data Setup:**
+Selected Hotel = ₹21,000
+Candidate = ₹21,000
 
-**Title:** Verify login with empty fields
-
-**Preconditions:**
-- Login page is open.
-
-**Test Steps:**
-1. Leave Email blank.
-2. Leave Password blank.
-3. Click Login.
+**Steps:**
+Generate recommendations.
 
 **Expected Result:**
-- Required field validation messages are displayed.
-
-**Priority:** High
-
-**Status:** Not Executed
+Candidate should not be recommended.
 
 ---
 
-### Test Case 5
-**Test Case ID:** TC_LOGIN_005
+### TC_005 - Inventory exactly 1 room available
+**Preconditions/Data Setup:**
+Inventory Available = 1
 
-**Title:** Verify password masking
-
-**Preconditions:**
-- Login page is open.
-
-**Test Steps:**
-1. Enter password in Password field.
+**Steps:**
+Generate recommendations.
 
 **Expected Result:**
-- Password characters are hidden using dots or asterisks.
+Hotel should be recommended.
 
-**Priority:** Medium
+---
 
-**Status:** Not Executed
+### TC_006 - Exactly 10 eligible hotels
+**Preconditions/Data Setup:**
+Only 10 hotels satisfy all recommendation rules.
+
+**Steps:**
+Generate recommendations.
+
+**Expected Result:**
+All 10 hotels should be displayed.
+
+---
+
+## Negative Test Cases
+
+### TC_007 - Selected hotel appears in recommendations
+
+**Preconditions/Data Setup:**
+Selected hotel exists in candidate list.
+
+**Steps:**
+Generate recommendations.
+
+**Expected Result:**
+Selected hotel should never appear.
+
+---
+
+### TC_008 - Inactive hotel
+
+**Preconditions/Data Setup:**
+Candidate hotel status = Inactive.
+
+**Steps:**
+Generate recommendations.
+
+**Expected Result:**
+Inactive hotel should be excluded.
+
+---
+
+### TC_009 - Sold out hotel
+
+**Preconditions/Data Setup:**
+Inventory = 0
+
+**Steps:**
+Generate recommendations.
+
+**Expected Result:**
+Hotel should not be displayed.
+
+---
+
+### TC_010 - Candidate score lower than selected
+
+**Preconditions/Data Setup:**
+Candidate overall score is lower.
+
+**Steps:**
+Generate recommendations.
+
+**Expected Result:**
+Hotel should not be recommended.
+
+---
+
+### TC_011 - Missing review score
+
+**Preconditions/Data Setup:**
+Review score is NULL.
+
+**Steps:**
+Generate recommendations.
+
+**Expected Result:**
+System should handle missing data gracefully according to business rules.
+
+---
+
+### TC_012 - Empty recommendation dataset
+
+**Preconditions/Data Setup:**
+No hotel satisfies recommendation criteria.
+
+**Steps:**
+Generate recommendations.
+
+**Expected Result:**
+Display "No recommendations available."
+
+---
+
+## Ranking / Sorting Test Cases
+
+### TC_013 - Verify ScoreDelta sorting
+
+**Preconditions/Data Setup:**
+Multiple hotels have different ScoreDelta values.
+
+**Steps:**
+Generate recommendations.
+
+**Expected Result:**
+Hotels should be sorted by highest ScoreDelta.
+
+---
+
+### TC_014 - Verify price sorting when ScoreDelta is same
+
+**Preconditions/Data Setup:**
+Two hotels have identical ScoreDelta.
+
+**Steps:**
+Generate recommendations.
+
+**Expected Result:**
+Lower priced hotel should appear first.
+
+---
+
+### TC_015 - Verify distance sorting
+
+**Preconditions/Data Setup:**
+Hotels have same ScoreDelta and price.
+
+**Steps:**
+Generate recommendations.
+
+**Expected Result:**
+Closer hotel should appear first.
+
+---
+
+### TC_016 - Verify review count sorting
+
+**Preconditions/Data Setup:**
+Hotels have same ScoreDelta, price and distance.
+
+**Steps:**
+Generate recommendations.
+
+**Expected Result:**
+Hotel with higher review count should rank higher.
+
+---
+
+## Data Correctness Test Cases
+
+### TC_017 - Verify total price calculation
+
+**Preconditions/Data Setup:**
+Known nightly rate and stay duration.
+
+**Steps:**
+Generate recommendations.
+
+**Expected Result:**
+Total price should equal nightly price × number of nights.
+
+---
+
+### TC_018 - Verify currency consistency
+
+**Preconditions/Data Setup:**
+One hotel has USD while others use INR.
+
+**Steps:**
+Generate recommendations.
+
+**Expected Result:**
+Currency should be converted or handled as per business rules.
+
+---
+
+### TC_019 - Verify stale inventory
+
+**Preconditions/Data Setup:**
+Hotel inventory recently became unavailable.
+
+**Steps:**
+Generate recommendations.
+
+**Expected Result:**
+Outdated inventory should not be displayed.
+
+---
+
+### TC_020 - Verify missing amenities
+
+**Preconditions/Data Setup:**
+Hotel has no amenity information.
+
+**Steps:**
+Generate recommendations.
+
+**Expected Result:**
+System should display available data without crashing and handle missing amenities appropriately.
